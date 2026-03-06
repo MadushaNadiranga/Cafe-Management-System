@@ -10,11 +10,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
 
 @Service
 public class JwtUtil {
 
-    private String secret = "btechday";
+
+
+    private final Key key = Keys.hmacShaKeyFor(
+            "CafeManagementSystemJwtSecretKeyForSpringBootApplication123".getBytes()
+    );
 
     public String extractUserName(String token){
         return extractClaims(token,Claims::getSubject);
@@ -30,7 +36,7 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token){
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token){
@@ -49,7 +55,8 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.ES256,secret).compact();
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails){
