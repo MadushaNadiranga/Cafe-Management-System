@@ -7,8 +7,10 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 
-@NamedQuery(name = "Category.getAllCategory", query = "select c from Category c")
-
+@NamedQuery(
+        name = "Category.getAllCategory",
+        query = "select c from Category c where c.id in (select p.category.id from Product p where p.status = 'true')"
+)
 @Data
 @Entity
 @DynamicUpdate
